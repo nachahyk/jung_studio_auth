@@ -13,4 +13,6 @@ export 'src/presentation/controllers/auth_cubit.dart';
 export 'src/presentation/controllers/auth_state.dart';
 export 'src/presentation/pages/login_page.dart';
 export 'src/presentation/pages/login_page_strings.dart';
+export 'src/presentation/pages/account_profile_page.dart';
+export 'src/presentation/pages/account_profile_page_strings.dart';
 export 'src/presentation/widgets/google_logo.dart';
