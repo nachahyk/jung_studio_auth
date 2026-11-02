@@ -16,6 +16,7 @@ class AppUser {
     this.addressLat,
     this.addressLng,
     this.createdAt,
+    this.completedTours = const {},
   });
 
   final String id;
@@ -29,5 +30,26 @@ class AppUser {
   final double? addressLng;
   final DateTime? createdAt;
 
+  /// Ids of the first-run guided tours this account has finished or skipped
+  /// (e.g. `'landing'`, `'aim_jung'`) — stored on the account (Supabase auth
+  /// user metadata), so each tour shows once per account, on any device.
+  final Set<String> completedTours;
+
   String get displayName => fullName ?? email ?? 'Guest';
+
+  bool hasCompletedTour(String tourId) => completedTours.contains(tourId);
+
+  AppUser withCompletedTour(String tourId) => AppUser(
+        id: id,
+        isAnonymous: isAnonymous,
+        email: email,
+        fullName: fullName,
+        avatarUrl: avatarUrl,
+        phone: phone,
+        address: address,
+        addressLat: addressLat,
+        addressLng: addressLng,
+        createdAt: createdAt,
+        completedTours: {...completedTours, tourId},
+      );
 }

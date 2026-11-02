@@ -63,6 +63,8 @@ class _FakeAuthRepository implements AuthRepository {
       false;
   @override
   Future<void> signInWithGoogle() async {}
+  @override
+  Future<void> completeTour(String tourId) async {}
 }
 
 const _strings = AccountProfilePageStrings(

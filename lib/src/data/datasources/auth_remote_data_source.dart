@@ -47,6 +47,15 @@ class AuthRemoteDataSource {
 
   Future<void> signOut() => _client.auth.signOut();
 
+  /// Adds [tourId] to the signed-in account's `completed_tours` user
+  /// metadata (Supabase merges top-level metadata keys, so other keys are
+  /// untouched). Every account — anonymous included — may update its own.
+  Future<void> addCompletedTour(String tourId) async {
+    final current = completedToursFromMetadata(_client.auth.currentUser?.userMetadata);
+    if (current.contains(tourId)) return;
+    await _client.auth.updateUser(UserAttributes(data: {'completed_tours': [...current, tourId]}));
+  }
+
   Future<Map<String, dynamic>?> fetchProfile(String userId) {
     return _client.from('profiles').select().eq('id', userId).maybeSingle();
   }
@@ -74,4 +83,11 @@ class AuthRemoteDataSource {
         .select()
         .single();
   }
+}
+
+/// Reads the `completed_tours` list out of Supabase auth user metadata,
+/// tolerating it being absent or malformed.
+Set<String> completedToursFromMetadata(Map<String, dynamic>? metadata) {
+  final raw = metadata?['completed_tours'];
+  return raw is List ? raw.whereType<String>().toSet() : <String>{};
 }

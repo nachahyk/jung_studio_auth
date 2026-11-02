@@ -66,6 +66,25 @@ class AuthCubit extends Cubit<AppAuthState> {
 
   Future<void> signOut() => _repository.signOut();
 
+  /// Marks the first-run tour [tourId] as done for the signed-in account.
+  ///
+  /// Applied to the in-memory user right away (so the tour can't reappear
+  /// this session even if saving fails or is slow), then saved to the
+  /// account. A failed save is deliberately *not* surfaced as [AuthError]:
+  /// that state reads as signed-out to the router, and a tour flag isn't
+  /// worth bouncing the user to the login screen over — worst case, the
+  /// tour shows once more on their next visit.
+  Future<void> completeTour(String tourId) async {
+    final current = state;
+    if (current is! AuthAuthenticated || current.user.hasCompletedTour(tourId)) return;
+    emit(AuthAuthenticated(current.user.withCompletedTour(tourId)));
+    try {
+      await _repository.completeTour(tourId);
+    } catch (_) {
+      // Best effort — see the doc comment above.
+    }
+  }
+
   /// Returns `true` on success. On failure, emits [AuthError] and leaves the
   /// caller to read [AppAuthState] for the message (matching the other
   /// sign-in/up methods' error-reporting convention).

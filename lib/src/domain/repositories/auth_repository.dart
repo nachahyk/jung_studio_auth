@@ -25,6 +25,10 @@ abstract class AuthRepository {
   Future<void> signInWithGoogle();
   Future<void> signOut();
 
+  /// Records on the signed-in account that it has finished (or skipped) the
+  /// first-run tour [tourId], so it isn't shown again on any device.
+  Future<void> completeTour(String tourId);
+
   /// Updates the `profiles` row for [userId] and returns the refreshed
   /// [AppUser]. Passing `null` for [phone]/[address] clears that field.
   Future<AppUser> updateProfile({

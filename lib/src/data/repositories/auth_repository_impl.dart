@@ -34,12 +34,19 @@ class AuthRepositoryImpl implements AuthRepository {
       address: row?['address'] as String?,
       addressLat: (row?['address_lat'] as num?)?.toDouble(),
       addressLng: (row?['address_lng'] as num?)?.toDouble(),
-      createdAt: row?['created_at'] != null ? DateTime.parse(row!['created_at'] as String) : null,
+      // The profile row's timestamp when it has one, else the auth account's
+      // own (always present) — so "how new is this account" never comes
+      // back empty just because the profile row lacks it.
+      createdAt: DateTime.tryParse((row?['created_at'] as String?) ?? '') ?? DateTime.tryParse(user.createdAt),
+      completedTours: completedToursFromMetadata(user.userMetadata),
     );
   }
 
   @override
   Future<void> signInAnonymously() => _remoteDataSource.signInAnonymously();
+
+  @override
+  Future<void> completeTour(String tourId) => _remoteDataSource.addCompletedTour(tourId);
 
   @override
   Future<void> signInWithEmailPassword(String email, String password) {
